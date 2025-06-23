@@ -47,61 +47,71 @@
   </div>
 
   <script>
-    const audio = document.getElementById("bg-music");
-    const currentTitle = document.getElementById("current-title");
-    const volumeSlider = document.getElementById("volume-slider");
+  const audio = document.getElementById("bg-music");
+  const currentTitle = document.getElementById("current-title");
+  const volumeSlider = document.getElementById("volume-slider");
 
-    const musicList = [
-      { title: "Let's Play Ogre!", url: "https://codejsn.github.io/Ogre/Music/Let%E2%80%99s%20Play%20Ogre!.mp3" },
-      { title: "Memory of Ogre's", url: "https://codejsn.github.io/Ogre/Music/Memory%20of%20Ogre's.mp3" },
-      { title: "오우거 NEXT ver.2", url: "https://codejsn.github.io/Ogre/Music/%EC%98%A4%EC%9A%B0%EA%B1%B0%20NEXT%20ver.2.mp3" },
-      { title: "오우거 NEXT", url: "https://codejsn.github.io/Ogre/Music/%EC%98%A4%EC%9A%B0%EA%B1%B0%20NEXT.mp3" },
-      { title: "전설이 되어 ver.2", url: "https://codejsn.github.io/Ogre/Music/%EC%A0%84%EC%84%A4%EC%9D%B4%20%EB%90%98%EC%96%B4%20(Become%20the%20Legend)%20ver.2.mp3" },
-      { title: "전설이 되어", url: "https://codejsn.github.io/Ogre/Music/%EC%A0%84%EC%84%A4%EC%9D%B4%20%EB%90%98%EC%96%B4%20(Become%20the%20Legend).mp3" }
-    ];
+  const musicList = [
+    { title: "Let’s Play Ogre!", url: "https://codejsn.github.io/Ogre/Music/Let%E2%80%99s%20Play%20Ogre!.mp3" },
+    { title: "Memory of Ogre's", url: "https://codejsn.github.io/Ogre/Music/Memory%20of%20Ogre's.mp3" },
+    { title: "오우거 NEXT ver.2", url: "https://codejsn.github.io/Ogre/Music/%EC%98%A4%EC%9A%B0%EA%B1%B0%20NEXT%20ver.2.mp3" },
+    { title: "오우거 NEXT", url: "https://codejsn.github.io/Ogre/Music/%EC%98%A4%EC%9A%B0%EA%B1%B0%20NEXT.mp3" },
+    { title: "전설이 되어 ver.2", url: "https://codejsn.github.io/Ogre/Music/%EC%A0%84%EC%84%A4%EC%9D%B4%20%EB%90%98%EC%96%B4%20(Become%20the%20Legend)%20ver.2.mp3" },
+    { title: "전설이 되어", url: "https://codejsn.github.io/Ogre/Music/%EC%A0%84%EC%84%A4%EC%9D%B4%20%EB%90%98%EC%96%B4%20(Become%20the%20Legend).mp3" }
+  ];
 
-    let currentIndex = -1;
+  let currentIndex = localStorage.getItem('currentMusicIndex');
+  if (currentIndex !== null) {
+    currentIndex = Number(currentIndex);
+  } else {
+    currentIndex = -1;
+  }
 
-    function getNextIndex() {
-      let next;
-      do {
-        next = Math.floor(Math.random() * musicList.length);
-      } while (next === currentIndex);
-      return next;
-    }
+  function getNextIndex() {
+    let next;
+    do {
+      next = Math.floor(Math.random() * musicList.length);
+    } while (next === currentIndex);
+    return next;
+  }
 
-    function loadTrack(index) {
-      currentIndex = index;
-      const track = musicList[index];
-      audio.src = track.url;
-      currentTitle.textContent = track.title;
-    }
+  function loadTrack(index) {
+    currentIndex = index;
+    localStorage.setItem('currentMusicIndex', currentIndex);
+    const track = musicList[index];
+    audio.src = track.url;
+    currentTitle.textContent = track.title;
+  }
 
-    function playMusic() {
-      audio.play();
-    }
-
-    function pauseMusic() {
-      audio.pause();
-    }
-
-    function nextMusic() {
-      loadTrack(getNextIndex());
-      playMusic();
-    }
-
-    // 자동 다음 곡
-    audio.addEventListener("ended", nextMusic);
-
-    // 볼륨 제어
-    volumeSlider.addEventListener("input", () => {
-      audio.volume = parseFloat(volumeSlider.value);
-    });
-
-    // 초기 설정
-    audio.volume = parseFloat(volumeSlider.value);
-    loadTrack(getNextIndex());
+  function playMusic() {
     audio.play();
-  </script>
+  }
+
+  function pauseMusic() {
+    audio.pause();
+  }
+
+  function nextMusic() {
+    loadTrack(getNextIndex());
+    playMusic();
+  }
+
+  audio.addEventListener("ended", nextMusic);
+
+  volumeSlider.addEventListener("input", () => {
+    audio.volume = parseFloat(volumeSlider.value);
+  });
+
+  audio.volume = parseFloat(volumeSlider.value);
+
+  // 초기 재생곡 로드
+  if (currentIndex === -1) {
+    loadTrack(getNextIndex());
+  } else {
+    loadTrack(currentIndex);
+  }
+  audio.play();
+</script>
+
 </body>
 </html>
