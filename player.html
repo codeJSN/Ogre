@@ -1,129 +1,107 @@
-<!-- index.html -->
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>웹 호스팅</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ogre Music Player</title>
+  <style>
+    body {
+      margin: 0;
+      background: #222;
+      color: white;
+      font-family: sans-serif;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    #player-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    #controls button {
+      background: #444;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 6px;
+    }
+    #volume-slider {
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
-    git pages 입니다.
-   <style>
-  #floating-player {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(30, 30, 30, 0.95);
-    color: white;
-    font-size: 13px;
-    padding: 14px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    z-index: 9999;
-    font-family: sans-serif;
-    max-width: 280px;
-    line-height: 1.6;
-  }
-  #floating-player button {
-    margin-top: 8px;
-    margin-right: 6px;
-    font-size: 12px;
-    background-color: #444;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 4px 10px;
-    cursor: pointer;
-  }
-  .volume-control {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 10px;
-  }
-  #volume-slider {
-    flex: 1;
-    margin: 0;
-  }
-</style>
-    
-<div id='floating-player'>
-  🎵 재생 중: <span id='current-title'>-</span><br/>
-  <button onclick='playMusic()'>&#9205; 재생</button>
-  <button onclick='stopMusic()'>&#9209; 정지</button>
-  <button onclick='nextMusic()'>&#9197; 다음곡</button>
-  <div class='volume-control'>
-    🔉 볼륨: <input id='volume-slider' max='1' min='0' step='0.01' type='range' value='0.2'/>
+  <div id="player-box">
+    🎵 현재 곡: <span id="current-title">-</span>
+    <audio id="bg-music" autoplay loop></audio>
+    <div id="controls">
+      <button onclick="playMusic()">⏵ 재생</button>
+      <button onclick="pauseMusic()">⏸ 정지</button>
+      <button onclick="nextMusic()">⏭ 다음곡</button>
+    </div>
+    <label>🔉 볼륨: <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.25"></label>
   </div>
-</div>
 
-<audio autoplay='true' id='bg-music' muted='false'/>
+  <script>
+    const audio = document.getElementById("bg-music");
+    const currentTitle = document.getElementById("current-title");
+    const volumeSlider = document.getElementById("volume-slider");
 
-<script type='text/javascript'>
-  const audio = document.getElementById(&quot;bg-music&quot;);
-  const currentTitle = document.getElementById(&quot;current-title&quot;);
-  const volumeSlider = document.getElementById(&quot;volume-slider&quot;);
+    const musicList = [
+      { title: "Let's Play Ogre!", url: "https://codejsn.github.io/Ogre/Music/Let%E2%80%99s%20Play%20Ogre!.mp3" },
+      { title: "Memory of Ogre's", url: "https://codejsn.github.io/Ogre/Music/Memory%20of%20Ogre's.mp3" },
+      { title: "오우거 NEXT ver.2", url: "https://codejsn.github.io/Ogre/Music/%EC%98%A4%EC%9A%B0%EA%B1%B0%20NEXT%20ver.2.mp3" },
+      { title: "오우거 NEXT", url: "https://codejsn.github.io/Ogre/Music/%EC%98%A4%EC%9A%B0%EA%B1%B0%20NEXT.mp3" },
+      { title: "전설이 되어 ver.2", url: "https://codejsn.github.io/Ogre/Music/%EC%A0%84%EC%84%A4%EC%9D%B4%20%EB%90%98%EC%96%B4%20(Become%20the%20Legend)%20ver.2.mp3" },
+      { title: "전설이 되어", url: "https://codejsn.github.io/Ogre/Music/%EC%A0%84%EC%84%A4%EC%9D%B4%20%EB%90%98%EC%96%B4%20(Become%20the%20Legend).mp3" }
+    ];
 
-  const musicList = [
-    { title: &quot;Let&#39;s Play Ogre!&quot;, url: &quot;https://codejsn.github.io/Ogre/Music/Let%E2%80%99s%20Play%20Ogre!.mp3&quot; },
-    { title: &quot;Memory of Ogre&#39;s&quot;, url: &quot;https://codejsn.github.io/Ogre/Music/Memory%20of%20Ogre&#39;s.mp3&quot; },
-    { title: &quot;오우거 NEXT ver.2&quot;, url: &quot;https://codejsn.github.io/Ogre/Music/%EC%98%A4%EC%9A%B0%EA%B1%B0%20NEXT%20ver.2.mp3&quot; },
-    { title: &quot;오우거 NEXT&quot;, url: &quot;https://codejsn.github.io/Ogre/Music/%EC%98%A4%EC%9A%B0%EA%B1%B0%20NEXT.mp3&quot; },
-    { title: &quot;전설이 되어 ver.2&quot;, url: &quot;https://codejsn.github.io/Ogre/Music/%EC%A0%84%EC%84%A4%EC%9D%B4%20%EB%90%98%EC%96%B4%20(Become%20the%20Legend)%20ver.2.mp3&quot; },
-    { title: &quot;전설이 되어&quot;, url: &quot;https://codejsn.github.io/Ogre/Music/%EC%A0%84%EC%84%A4%EC%9D%B4%20%EB%90%98%EC%96%B4%20(Become%20the%20Legend).mp3&quot; }
-  ];
+    let currentIndex = -1;
 
-  let currentIndex = -1;
-
-  function getNextIndex() {
-    let next;
-    do {
-      next = Math.floor(Math.random() * musicList.length);
-    } while (next === currentIndex);
-    return next;
-  }
-
-  function loadTrack(index) {
-    currentIndex = index;
-    const track = musicList[index];
-    audio.src = track.url;
-    currentTitle.textContent = track.title;
-  }
-
-  function playMusic() {
-    if (audio.paused) {
-      audio.play().catch(err =&gt; console.warn(&quot;Play blocked:&quot;, err));
+    function getNextIndex() {
+      let next;
+      do {
+        next = Math.floor(Math.random() * musicList.length);
+      } while (next === currentIndex);
+      return next;
     }
-  }
 
-  function stopMusic() {
-    audio.pause();
-    audio.currentTime = 0;
-  }
+    function loadTrack(index) {
+      currentIndex = index;
+      const track = musicList[index];
+      audio.src = track.url;
+      currentTitle.textContent = track.title;
+    }
 
-  function nextMusic() {
-    loadTrack(getNextIndex());
-    playMusic();
-  }
+    function playMusic() {
+      audio.play();
+    }
 
-  audio.addEventListener(&#39;ended&#39;, () =&gt; {
-    nextMusic();
-  });
+    function pauseMusic() {
+      audio.pause();
+    }
 
-  window.addEventListener(&#39;click&#39;, () =&gt; {
-    audio.muted = false;
-    playMusic();
-  }, { once: true });
+    function nextMusic() {
+      loadTrack(getNextIndex());
+      playMusic();
+    }
 
-  volumeSlider.addEventListener(&#39;input&#39;, () =&gt; {
+    // 자동 다음 곡
+    audio.addEventListener("ended", nextMusic);
+
+    // 볼륨 제어
+    volumeSlider.addEventListener("input", () => {
+      audio.volume = parseFloat(volumeSlider.value);
+    });
+
+    // 초기 설정
     audio.volume = parseFloat(volumeSlider.value);
-  });
-
-  audio.volume = parseFloat(volumeSlider.value);
-  loadTrack(getNextIndex());
-</script>
-
+    loadTrack(getNextIndex());
+    audio.play();
+  </script>
 </body>
 </html>
-출처: https://devyihyun.tistory.com/203 [이롭게 현명하게:티스토리]
